@@ -18,7 +18,7 @@ class EnumsPluginsError(Exception):
 
 
 class EnumsPluginConfig(PluginConfig):
-    type = "turms.plugins.enums.EnumsPlugin"
+    type: str = "turms.plugins.enums.EnumsPlugin"
     skip_underscore: bool = False
     skip_double_underscore: bool = True
     skip_unreferenced: bool = True
@@ -27,7 +27,7 @@ class EnumsPluginConfig(PluginConfig):
 
     class Config:
         env_prefix = "TURMS_PLUGINS_ENUMS_"
-
+        arbitrary_types_allowed = True
 
 def generate_enums(
     client_schema: GraphQLSchema,

@@ -1,14 +1,14 @@
 import ast
 from typing import List
-from pydantic import BaseModel, BaseSettings
-
+from pydantic import BaseModel
+from pydantic_settings import BaseSettings
 
 class ParserConfig(BaseSettings):
     type: str
 
     class Config:
         extra = "forbid"
-
+        arbitrary_types_allowed = True
 
 class Parser(BaseModel):
     """Base class for all parsers
@@ -17,6 +17,8 @@ class Parser(BaseModel):
     modify the AST before it is written to the file."""
 
     config: ParserConfig
+    class Config:
+        arbitrary_types_allowed = True
 
     def parse_ast(
         self,

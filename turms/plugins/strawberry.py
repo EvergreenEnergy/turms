@@ -224,7 +224,7 @@ def default_generate_enums(
 
 
 class StrawberryPluginConfig(PluginConfig):
-    type = "turms.plugins.strawberry.Strawberry"
+    type: str = "turms.plugins.strawberry.Strawberry"
     generate_directives: bool = True
     generate_scalars: bool = True
     builtin_directives: List[str] = ["include", "skip", "deprecated", "specifiedBy"]
@@ -243,7 +243,7 @@ class StrawberryPluginConfig(PluginConfig):
 
     class Config:
         env_prefix = "TURMS_PLUGINS_STRAWBERRY_"
-
+        arbitrary_types_allowed = True
 
 def generate_object_field_annotation(
     graphql_type: GraphQLType,

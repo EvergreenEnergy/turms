@@ -1,5 +1,7 @@
 import builtins
-from pydantic import AnyHttpUrl, BaseModel, BaseSettings, Field, validator
+from pydantic import BaseModel
+from pydantic import AnyHttpUrl, Field, validator
+from pydantic_settings import BaseSettings
 from typing import (
     Any,
     Dict,
@@ -19,7 +21,7 @@ class ConfigProxy(BaseModel):
 
     class Config:
         extra = "allow"
-
+        arbitrary_types_allowed = True
 
 class ImportableFunctionMixin(Protocol):
     @classmethod
@@ -30,7 +32,7 @@ class ImportableFunctionMixin(Protocol):
         yield cls.validate
 
     @classmethod
-    def validate(cls, v):
+    def validate(cls, v, x):
         if not callable(v):
             if not isinstance(v, str):
                 raise TypeError("string required")
@@ -49,7 +51,7 @@ class PythonType(str):
         yield cls.validate
 
     @classmethod
-    def validate(cls, v):
+    def validate(cls, v, x):
         if not isinstance(v, str):
             raise TypeError("string required")
         if v not in dir(builtins):
@@ -102,11 +104,11 @@ class FreezeConfig(BaseSettings):
     """The core types (Input, Fragment, Object, Operation) to freeze"""
 
     exclude: Optional[List[str]] = Field(
-        description="List of types to exclude from freezing"
+        [], description="List of types to exclude from freezing"
     )
     """List of types to exclude from freezing"""
     include: Optional[List[str]] = Field(
-        description="List of types to include in freezing"
+        [], description="List of types to include in freezing"
     )
     """The types to freeze"""
     exclude_fields: Optional[List[str]] = Field(
@@ -137,18 +139,18 @@ class OptionsConfig(BaseSettings):
 
     enabled: bool = Field(False, description="Enabling this, will freeze the schema")
     """Enabling this, will freeze the schema"""
-    extra: ExtraOptions
+    extra: ExtraOptions = "ignore"
     """Extra options for pydantic"""
-    allow_mutation: Optional[bool]
+    allow_mutation: Optional[bool] = False
     """Allow mutation"""
-    allow_population_by_field_name: Optional[bool]
+    allow_population_by_field_name: Optional[bool] = False
     """Allow population by field name"""
-    orm_mode: Optional[bool]
+    orm_mode: Optional[bool] = False
     """ORM mode"""
-    use_enum_values: Optional[bool]
+    use_enum_values: Optional[bool] = False
     """Use enum values"""
 
-    validate_assignment: Optional[bool]
+    validate_assignment: Optional[bool] = False
     """Validate assignment"""
 
     types: List[GraphQLTypes] = Field(
@@ -158,11 +160,11 @@ class OptionsConfig(BaseSettings):
     """The core types (Input, Fragment, Object, Operation) to enable this option"""
 
     exclude: Optional[List[str]] = Field(
-        description="List of types to exclude from setting this option"
+        [], description="List of types to exclude from setting this option"
     )
     """List of types to exclude from setting this option"""
     include: Optional[List[str]] = Field(
-        description="List of types to include in setting these options"
+        [], description="List of types to include in setting these options"
     )
     """The types to freeze"""
 
@@ -184,7 +186,7 @@ class GeneratorConfig(BaseSettings):
     """The output directory for the generated models"""
     generated_name: str = "schema.py"
     """ The name of the generated file within the output directory"""
-    documents: Optional[str]
+    documents: Optional[str] = None
     """The documents to parse. Setting this will overwrite the documents in the graphql config"""
     verbose: bool = False
     """Enable verbose logging"""
@@ -273,14 +275,16 @@ class GeneratorConfig(BaseSettings):
 
     class Config:
         env_prefix = "TURMS_"
-        extra = "forbid"
-
+        extra = "ignore"
+        arbitrary_types_allowed = True
 
 class Extensions(BaseModel):
     """Wrapping class to be able to extract the tums configuraiton"""
 
     turms: GeneratorConfig
     "The turms configuration"
+    class Config:
+        arbitrary_types_allowed = True
 
 
 class AdvancedSchemaField(BaseModel):
@@ -312,6 +316,7 @@ class GraphQLProject(BaseSettings):
     class Config:
         env_prefix = "TURMS_GRAPHQL_"
         extra = "allow"
+        arbitrary_types_allowed = True
 
 
 class GraphQLConfigMultiple(BaseSettings):
@@ -325,7 +330,7 @@ class GraphQLConfigMultiple(BaseSettings):
 
     class Config:
         extra = "allow"
-
+        arbitrary_types_allowed = True
 
 class GraphQLConfigSingle(GraphQLProject):
     """Configuration for a single GraphQL project
@@ -336,3 +341,4 @@ class GraphQLConfigSingle(GraphQLProject):
 
     class Config:
         extra = "allow"
+        arbitrary_types_allowed = True

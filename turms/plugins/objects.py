@@ -29,14 +29,14 @@ from turms.config import GraphQLTypes
 
 
 class ObjectsPluginConfig(PluginConfig):
-    type = "turms.plugins.objects.ObjectsPlugin"
+    type: str = "turms.plugins.objects.ObjectsPlugin"
     types_bases: List[str] = ["pydantic.BaseModel"]
     skip_underscore: bool = False
     skip_double_underscore: bool = True
 
     class Config:
         env_prefix = "TURMS_PLUGINS_OBJECTS_"
-
+        arbitrary_types_allowed = True
 
 def generate_object_field_annotation(
     graphql_type: GraphQLType,

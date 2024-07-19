@@ -32,13 +32,13 @@ logger = logging.getLogger(__name__)
 
 
 class FragmentsPluginConfig(PluginConfig):
-    type = "turms.plugins.fragments.FragmentsPlugin"
-    fragment_bases: List[str] = None
-    fragments_glob: Optional[str]
+    type: str = "turms.plugins.fragments.FragmentsPlugin"
+    fragment_bases: Optional[List[str]] = None
+    fragments_glob: Optional[str] = None
 
     class Config:
         env_prefix = "TURMS_PLUGINS_FRAGMENTS_"
-
+        arbitrary_types_allowed = True
 
 def get_fragment_bases(
     config: GeneratorConfig,

@@ -1,6 +1,7 @@
 from abc import abstractmethod
 
-from pydantic import BaseModel, BaseSettings
+from pydantic import BaseModel
+from pydantic_settings import BaseSettings
 from turms.config import GeneratorConfig
 
 
@@ -9,7 +10,7 @@ class ProcessorConfig(BaseSettings):
 
     class Config:
         extra = "forbid"
-
+        arbitrary_types_allowed = True
 
 class Processor(BaseModel):
     """Base class for all processors
@@ -20,6 +21,9 @@ class Processor(BaseModel):
     """
 
     config: ProcessorConfig
+
+    class Config:
+        arbitrary_types_allowed = True
 
     @abstractmethod
     def run(gen_file: str, config: GeneratorConfig):

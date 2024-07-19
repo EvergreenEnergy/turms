@@ -1,6 +1,6 @@
 import ast
 import os
-from typing import Dict, List, Optional, Callable
+from typing import Dict, List, Optional, Callable, Type, TypeAlias, _AnnotatedAlias
 
 import yaml
 from graphql import GraphQLSchema, parse, build_ast_schema, build_client_schema
@@ -27,7 +27,7 @@ from turms.parsers.base import Parser
 from turms.processors.base import Processor
 from turms.registry import ClassRegistry
 from turms.stylers.base import Styler
-from pydantic.error_wrappers import ValidationError
+from pydantic import ValidationError
 
 from .errors import GenerationError
 import json
@@ -231,6 +231,20 @@ def instantiate(module_path: str, **kwargs):
     return import_string(module_path)(**kwargs)
 
 
+def get_types_from_typing(t):
+    result = []
+    def recursive(t):
+        if type(t) in [_AnnotatedAlias]:
+            for arg in t.__args__:
+                recursive(arg)
+        elif type(t) is TypeAlias:
+            result.append(t.__subclasshook__.__self__)
+        else:
+            result.append(t)
+    recursive(t)
+    return result
+
+
 def build_schema_from_schema_type(
     schema: SchemaType, allow_introspection: bool = False
 ) -> GraphQLSchema:
@@ -283,15 +297,15 @@ def build_schema_from_schema_type(
 
             return build_ast_schema(parse(" ".join(dsl_subschemas)))
 
-    if isinstance(schema, AnyHttpUrl):
-        try:
-            dsl_string = load_dsl_from_url(schema)
-            return build_ast_schema(parse(dsl_string))
-        except Exception as e:
-            if allow_introspection:
-                intropection = load_introspection_from_url(schema)
-                return build_client_schema(intropection)
-            raise e
+    # if isinstance(schema, get_types_from_typing(AnyHttpUrl)):
+    #     try:
+    #         dsl_string = load_dsl_from_url(schema)
+    #         return build_ast_schema(parse(dsl_string))
+    #     except Exception as e:
+    #         if allow_introspection:
+    #             intropection = load_introspection_from_url(schema)
+    #             return build_client_schema(intropection)
+    #         raise e
 
     if isinstance(schema, str):
         try:
@@ -390,6 +404,7 @@ def generate(project: GraphQLProject, log: Optional[LogFunction] = None) -> str:
 
 def parse_asts_to_string(generated_ast: List[ast.AST]) -> str:
     module = ast.Module(body=generated_ast, type_ignores=[])
+    print(ast.dump(module))
     return ast.unparse(ast.fix_missing_locations(module))
 
 

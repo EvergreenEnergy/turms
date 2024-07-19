@@ -19,7 +19,8 @@ from graphql.language.ast import (
 from graphql.utilities.build_client_schema import GraphQLSchema
 from graphql.utilities.get_operation_root_type import get_operation_root_type
 from graphql.utilities.type_info import get_field_def
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
+from pydantic import Field
 from turms.config import GeneratorConfig
 from turms.plugins.base import Plugin, PluginConfig
 from turms.registry import ClassRegistry
@@ -59,21 +60,21 @@ class FunctionDefinition(BaseModel):
 
 
 class FuncsPluginConfig(PluginConfig):
-    type = "turms.plugins.funcs.FuncsPlugin"
-    funcs_glob: Optional[str]
-    prepend_sync: str = ""
-    prepend_async: str = "a"
-    collapse_lonely: bool = True
-    generate_protocol: bool = False
-    global_args: List[Arg] = []
-    global_kwargs: List[Kwarg] = []
-    definitions: List[FunctionDefinition] = []
-    extract_documentation: bool = True
-    argument_key_is_styled: bool = False
+    type: str = "turms.plugins.funcs.FuncsPlugin"
+    funcs_glob: Optional[str] = None
+    prepend_sync: Optional[str] = ""
+    prepend_async: Optional[str] = "a"
+    collapse_lonely: Optional[bool] = True
+    generate_protocol: Optional[bool] = False
+    global_args: Optional[List[Arg]] = []
+    global_kwargs: Optional[List[Kwarg]] = []
+    definitions: Optional[List[FunctionDefinition]] = []
+    extract_documentation: Optional[bool] = True
+    argument_key_is_styled: Optional[bool] = False
 
     class Config:
         env_prefix = "TURMS_PLUGINS_FUNCS_"
-
+        arbitrary_types_allowed = True
 
 def camel_to_snake(name):
     name = re.sub("(.)([A-Z][a-z]+)", r"\1_\2", name)

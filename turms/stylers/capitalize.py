@@ -1,9 +1,10 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
+from pydantic import Field
 from turms.stylers.base import BaseStyler
 
 
 class CapitalizeSylerConfig(BaseModel):
-    type = "turms.stylers.capitalize.CapitalizerSyler"
+    type: str = "turms.stylers.capitalize.CapitalizerSyler"
     capitalize_fragment: bool = True
     capitalize_query: bool = True
     capitalize_mutation: bool = True

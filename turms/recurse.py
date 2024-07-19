@@ -111,6 +111,7 @@ def recurse_annotation(
                             config,
                             subtree,
                             registry,
+                            is_optional,
                         )
 
                 additional_bases = get_additional_bases_for_type(
@@ -412,10 +413,11 @@ def recurse_annotation(
                     config,
                     subtree,
                     registry,
+                    is_optional,
                 )
 
             if isinstance(sub_node, InlineFragmentNode):
-                raise NotImplementedError("Inline Fragments are not yet implemented")
+                raise NotImplementedError()
 
         body = pick_fields if pick_fields else [ast.Pass()]
 
@@ -597,6 +599,7 @@ def type_field_node(
                 registry,
                 is_optional=is_optional,
             ),
+            value=ast.Constant(value=None),
             simple=1,
         )
 

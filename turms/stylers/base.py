@@ -1,6 +1,7 @@
 from abc import abstractmethod
 
-from pydantic import BaseModel, BaseSettings
+from pydantic import BaseModel
+from pydantic_settings import BaseSettings
 
 
 class StylerConfig(BaseSettings):
@@ -8,7 +9,7 @@ class StylerConfig(BaseSettings):
 
     class Config:
         extra = "forbid"
-
+        arbitrary_types_allowed = True
 
 class Styler(BaseModel):
     """Base class for all stylers
@@ -21,6 +22,9 @@ class Styler(BaseModel):
     """
 
     config: StylerConfig
+
+    class Config:
+        arbitrary_types_allowed = True
 
     @abstractmethod
     def style_subscription_name(self, name: str) -> str:

@@ -2,7 +2,9 @@ from abc import abstractmethod
 import ast
 from typing import List
 
-from pydantic import BaseModel, BaseSettings, Field
+from pydantic import BaseModel
+from pydantic import Field
+from pydantic_settings import BaseSettings
 from graphql.utilities.build_client_schema import GraphQLSchema
 from turms.config import LogFunction
 
@@ -11,7 +13,7 @@ class PluginConfig(BaseSettings):
 
     class Config:
         extra = "forbid"
-
+        arbitrary_types_allowed = True
 
 class Plugin(BaseModel):
     """

@@ -34,19 +34,19 @@ fragment_searcher = re.compile(r"\.\.\.(?P<fragment>[a-zA-Z]*)")
 
 
 class OperationsPluginConfig(PluginConfig):
-    type = "turms.plugins.operations.OperationsPlugin"
-    query_bases: List[str] = None
-    arguments_bases: List[str] = None
-    mutation_bases: List[str] = None
-    subscription_bases: List[str] = None
-    operations_glob: Optional[str]
-    create_arguments: bool = True
-    extract_documentation: bool = True
-    arguments_allow_population_by_field_name: bool = False
+    type: str = "turms.plugins.operations.OperationsPlugin"
+    query_bases: Optional[List[str]] = None
+    arguments_bases: Optional[List[str]] = None
+    mutation_bases: Optional[List[str] ]= None
+    subscription_bases: Optional[List[str]] = None
+    operations_glob: Optional[str] = None
+    create_arguments: Optional[bool] = True
+    extract_documentation: Optional[bool] = True
+    arguments_allow_population_by_field_name: Optional[bool] = False
 
     class Config:
         env_prefix = "TURMS_PLUGINS_OPERATIONS_"
-
+        arbitrary_types_allowed = True
 
 def get_query_bases(
     config: GeneratorConfig,
@@ -254,7 +254,7 @@ def generate_operation(
                                     arg="default",
                                     value=ast.Constant(
                                         value=parse_value_node(v.default_value)
-                                        if v.default_value is not None
+                                        if v.default_value
                                         else None
                                     ),
                                 ),
@@ -290,7 +290,7 @@ def generate_operation(
                                     arg="default",
                                     value=ast.Constant(
                                         value=parse_value_node(v.default_value)
-                                        if v.default_value is not None
+                                        if v.default_value
                                         else None
                                     ),
                                 ),

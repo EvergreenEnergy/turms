@@ -26,14 +26,14 @@ from turms.config import GraphQLTypes
 
 
 class InputsPluginConfig(PluginConfig):
-    type = "turms.plugins.inputs.InputsPlugin"
+    type: str = "turms.plugins.inputs.InputsPlugin"
     inputtype_bases: List[str] = ["pydantic.BaseModel"]
     skip_underscore: bool = True
     skip_unreferenced: bool = True
 
     class Config:
         env_prefix = "TURMS_PLUGINS_INPUTS_"
-
+        arbitrary_types_allowed = True
 
 def generate_input_annotation(
     type: GraphQLInputType,
@@ -175,16 +175,6 @@ def generate_inputs(
 
             if field_name != value_key:
                 registry.register_import("pydantic.Field")
-                keywords = [
-                    ast.keyword(
-                        arg="alias", value=ast.Constant(value=value_key)
-                    )
-                ]
-                if not isinstance(value.type, GraphQLNonNull):
-                    keywords.append(
-                        ast.keyword(arg="default", value=ast.Constant(None))
-                    )
-
                 assign = ast.AnnAssign(
                     target=ast.Name(field_name, ctx=ast.Store()),
                     annotation=generate_input_annotation(
@@ -198,11 +188,14 @@ def generate_inputs(
                     value=ast.Call(
                         func=ast.Name(id="Field", ctx=ast.Load()),
                         args=[],
-                        keywords=keywords,
+                        keywords=[
+                            ast.keyword(
+                                arg="alias", value=ast.Constant(value=value_key)
+                            )
+                        ],
                     ),
                     simple=1,
                 )
-
             else:
                 assign = ast.AnnAssign(
                     target=ast.Name(value_key, ctx=ast.Store()),
@@ -215,7 +208,6 @@ def generate_inputs(
                         is_optional=True,
                     ),
                     simple=1,
-                    value=ast.Constant(None) if not isinstance(value.type, GraphQLNonNull) else None,
                 )
 
             potential_comment = (

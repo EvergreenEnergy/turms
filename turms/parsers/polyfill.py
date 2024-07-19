@@ -11,7 +11,7 @@ class PolyfillPluginConfig(ParserConfig):
 
     class Config:
         env_prefix = "TURMS_PARSERS_POLYFILL_"
-
+        arbitrary_types_allowed = True
 
 def polyfill_python_seven(
     asts: List[ast.AST], config: PolyfillPluginConfig
