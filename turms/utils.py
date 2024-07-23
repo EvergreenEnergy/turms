@@ -94,7 +94,10 @@ def generate_typename_field(
     registry.register_import("typing.Optional")
     registry.register_import("typing.Literal")
 
-    keywords = [ast.keyword(arg="alias", value=ast.Constant(value="__typename"))]
+    keywords = [
+        ast.keyword(arg="alias", value=ast.Constant(value="__typename")),
+        ast.keyword(arg="default", value=ast.Constant(value=typename)),
+    ]
     if config.exclude_typenames:
         keywords.append(ast.keyword(arg="exclude", value=ast.Constant(value=True)))
 
