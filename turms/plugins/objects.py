@@ -300,18 +300,27 @@ def generate_types(
                     simple=1,
                 )
             else:
-                assign = ast.AnnAssign(
-                    target=ast.Name(value_key, ctx=ast.Store()),
-                    annotation=generate_object_field_annotation(
-                        value.type,
-                        classname,
-                        config,
-                        plugin_config,
-                        registry,
-                        is_optional=True,
-                    ),
-                    simple=1,
+                annotation = generate_object_field_annotation(
+                    value.type,
+                    classname,
+                    config,
+                    plugin_config,
+                    registry,
+                    is_optional=True,
                 )
+                if isinstance(annotation, ast.Subscript) and annotation.value.id == "Optional":
+                    assign = ast.AnnAssign(
+                        target=ast.Name(value_key, ctx=ast.Store()),
+                        annotation=annotation,
+                        value=ast.Constant(value=None),
+                        simple=1,
+                    )
+                else:
+                    assign = ast.AnnAssign(
+                        target=ast.Name(value_key, ctx=ast.Store()),
+                        annotation=annotation,
+                        simple=1,
+                    )
 
             potential_comment = (
                 value.description
