@@ -197,18 +197,27 @@ def generate_inputs(
                     simple=1,
                 )
             else:
-                assign = ast.AnnAssign(
-                    target=ast.Name(value_key, ctx=ast.Store()),
-                    annotation=generate_input_annotation(
+                annotation = generate_input_annotation(
                         value.type,
                         name,
                         config,
                         plugin_config,
                         registry,
                         is_optional=True,
-                    ),
-                    simple=1,
-                )
+                    )
+                if isinstance(annotation, ast.Subscript) and annotation.value.id == "Optional":
+                    assign = ast.AnnAssign(
+                        target=ast.Name(value_key, ctx=ast.Store()),
+                        annotation=annotation,
+                        value=ast.Constant(value=None),
+                        simple=1,
+                    )
+                else:
+                    assign = ast.AnnAssign(
+                        target=ast.Name(value_key, ctx=ast.Store()),
+                        annotation=annotation,
+                        simple=1,
+                    )
 
             potential_comment = (
                 value.description
